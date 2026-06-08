@@ -340,6 +340,38 @@
     font-size: 0.75rem;
     line-height: 2;
   }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .share-btn {
+    padding: 8px 18px;
+    background: transparent;
+    border: 1px solid var(--border-light);
+    border-radius: 2px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .share-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  .share-btn.copied {
+    border-color: #34d399;
+    color: #34d399;
+    background: rgba(52,211,153,0.08);
+  }
 </style>
 </head>
 <body>
@@ -349,9 +381,12 @@
     <h1>Market<span>.</span>Dashboard</h1>
     <p>Real-time product intelligence feed</p>
   </div>
-  <div class="live-badge">
-    <div class="live-dot"></div>
-    Live Feed
+  <div class="header-right">
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      Live Feed
+    </div>
+    <button class="share-btn" onclick="shareData()">↑ Share Data</button>
   </div>
 </header>
 
@@ -626,6 +661,27 @@ function syntaxHighlight(json) {
       cls = 'null-val';
     }
     return `<span class="${cls}">${match}</span>`;
+  });
+}
+
+function shareData() {
+  const payload = {
+    timestamp: new Date().toISOString(),
+    source: "market-dashboard",
+    items: products
+  };
+  const json = JSON.stringify(payload, null, 2);
+  console.log("SHARE PAYLOAD:", json);
+
+  // Copy to clipboard + visual feedback
+  navigator.clipboard.writeText(json).then(() => {
+    const btn = document.querySelector('.share-btn');
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '↑ Share Data';
+      btn.classList.remove('copied');
+    }, 2000);
   });
 }
 </script>
