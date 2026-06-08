@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Streaming Plans</title>
+
+<style>
+/* ==========================
+   Global Styles
+========================== */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    background:#0f172a;
+    color:#fff;
+    padding:60px 20px;
+}
+
+.container{
+    max-width:1200px;
+    margin:0 auto;
+}
+
+.header{
+    text-align:center;
+    margin-bottom:50px;
+}
+
+.header h1{
+    font-size:2.8rem;
+    margin-bottom:10px;
+}
+
+.header p{
+    color:#cbd5e1;
+}
+
+/* ==========================
+   Vertical Scroll Layout
+========================== */
+.pricing-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:30px;
+    max-width:650px;
+    margin:0 auto;
+}
+
+/* ==========================
+   Pricing Card
+========================== */
+.card{
+    background:#1e293b;
+    border-radius:20px;
+    padding:30px;
+    display:grid;
+    gap:18px;
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+
+    transition:
+        transform .4s ease,
+        box-shadow .4s ease;
+}
+
+/* Hover Animation */
+.card:hover{
+    transform:translateY(-10px) scale(1.03);
+    box-shadow:0 20px 40px rgba(0,0,0,.45);
+}
+
+.plan-name{
+    font-size:1.8rem;
+    font-weight:bold;
+}
+
+.price{
+    font-size:3rem;
+    font-weight:700;
+    color:#60a5fa;
+}
+
+.description{
+    color:#cbd5e1;
+    line-height:1.5;
+}
+
+/* ==========================
+   Features
+========================== */
+.features{
+    list-style:none;
+}
+
+.features li{
+    padding:12px 0;
+    border-bottom:1px solid rgba(255,255,255,.12);
+}
+
+/* ==========================
+   Buttons
+========================== */
+.btn{
+    text-decoration:none;
+    text-align:center;
+    background:#2563eb;
+    color:#fff;
+    padding:14px;
+    border-radius:12px;
+    font-weight:bold;
+    transition:background .3s ease;
+}
+
+.btn:hover{
+    background:#1d4ed8;
+}
+
+.btn:focus{
+    outline:3px solid #93c5fd;
+    outline-offset:3px;
+}
+
+/* ==========================
+   Recommended Plan
+========================== */
+.recommended{
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #4f46e5
+    );
+    position:relative;
+}
+
+.badge{
+    position:absolute;
+    top:20px;
+    right:20px;
+    background:#facc15;
+    color:#111827;
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:.8rem;
+    font-weight:bold;
+}
+
+.recommended .price{
+    color:#fff;
+}
+
+.recommended .btn{
+    background:#fff;
+    color:#2563eb;
+}
+
+.recommended .btn:hover{
+    background:#f1f5f9;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>Choose Your Perfect Plan</h1>
+        <p>Enjoy premium entertainment with the plan that fits your needs.</p>
+    </div>
+
+    <section class="pricing-grid">
+
+        <!-- Basic -->
+        <article class="card">
+            <h2 class="plan-name">Basic</h2>
+
+            <div class="price">₹149</div>
+
+            <p class="description">
+                Great for individual users who want affordable streaming.
+            </p>
+
+            <ul class="features">
+                <li>Device Limit: 1</li>
+                <li>Download Speed: Standard</li>
+                <li>Streaming Quality: FHD</li>
+                <li>No Ads</li>
+                <li>Custom Profiles: Not Included</li>
+                <li>Supported Devices: Mobile</li>
+            </ul>
+
+            <a href="#" class="btn">Get Started</a>
+        </article>
+
+        <!-- Pro -->
+        <article class="card recommended">
+            <span class="badge">Most Popular</span>
+
+            <h2 class="plan-name">Pro</h2>
+
+            <div class="price">₹299</div>
+
+            <p class="description">
+                Perfect for users who want better quality and more flexibility.
+            </p>
+
+            <ul class="features">
+                <li>Device Limit: 2</li>
+                <li>Download Speed: Faster</li>
+                <li>Streaming Quality: 2K</li>
+                <li>No Ads</li>
+                <li>Custom Profiles: Not Included</li>
+                <li>Supported Devices: Mobile + Windows</li>
+            </ul>
+
+            <a href="#" class="btn">Choose Pro</a>
+        </article>
+
+        <!-- Enterprise -->
+        <article class="card">
+            <h2 class="plan-name">Enterprise</h2>
+
+            <div class="price">₹499</div>
+
+            <p class="description">
+                The ultimate streaming experience with premium quality and performance.
+            </p>
+
+            <ul class="features">
+                <li>Device Limit: 4</li>
+                <li>Download Speed: Maximum</li>
+                <li>Streaming Quality: 4K + Dolby Vision</li>
+                <li>No Ads</li>
+                <li>Custom Profiles</li>
+                <li>Supported Devices: Mobile + Windows</li>
+            </ul>
+
+            <a href="#" class="btn">Go Premium</a>
+        </article>
+
+    </section>
+
+</div>
+
+</body>
+</html>

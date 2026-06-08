@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Automation Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0b;
+      --surface: #111114;
+      --border: #1e1e24;
+      --border-active: #3a3a48;
+      --accent: #5b5ef4;
+      --accent-glow: rgba(91,94,244,0.25);
+      --accent-dim: rgba(91,94,244,0.12);
+      --text: #e8e8f0;
+      --text-muted: #6b6b80;
+      --text-dim: #3a3a48;
+      --success: #34d399;
+      --success-dim: rgba(52,211,153,0.12);
+      --error: #f87171;
+      --error-dim: rgba(248,113,113,0.12);
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(91,94,244,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(91,94,244,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; height: 54px;
+      background: rgba(10,10,11,0.9);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+    }
+    .brand {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .brand-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 10px var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 10px var(--accent); }
+      50%      { box-shadow: 0 0 3px var(--accent); }
+    }
+    .topbar-time {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px; color: var(--text-muted);
+    }
+
+    /* ── Page wrapper ── */
+    .page {
+      position: relative; z-index: 1;
+      max-width: 860px; margin: 0 auto;
+      padding: 36px 24px 60px;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+
+    .page-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 22px; font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .page-sub { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .card-head {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-head-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .tg-dot {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: #229ED9;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+    }
+
+    .card-body { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+
+    /* ── Field ── */
+    .field { display: flex; flex-direction: column; gap: 7px; }
+    .field-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 0.07em; text-transform: uppercase;
+      color: var(--text-muted);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .req { color: var(--accent); }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 14px;
+      padding: 11px 14px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      resize: none;
+    }
+    .field textarea { min-height: 110px; }
+    .field input:focus,
+    .field textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    .field input::placeholder,
+    .field textarea::placeholder { color: var(--text-dim); }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    .char-hint {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; color: var(--text-dim);
+      text-align: right; margin-top: -4px;
+    }
+
+    /* ── Card footer ── */
+    .card-foot {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border-radius: 8px; border: none; outline: none;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .btn-ghost {
+      background: transparent; color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.04); color: var(--text); border-color: var(--border-active); }
+
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover:not(:disabled) {
+      background: #6e71f5;
+      box-shadow: 0 4px 18px var(--accent-glow);
+      transform: translateY(-1px);
+    }
+    .btn-primary:active:not(:disabled) { transform: translateY(0); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn.sending .btn-text { display: none; }
+    .btn.sending .btn-spin { display: flex; }
+    .btn-spin { display: none; align-items: center; gap: 6px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin-icon { animation: spin 0.7s linear infinite; }
+
+    /* ── Stats row ── */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px 18px;
+    }
+    .stat-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 6px;
+    }
+    .stat-val {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 26px; font-weight: 600; line-height: 1;
+      color: var(--accent);
+    }
+    .stat-val.green { color: var(--success); }
+    .stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 5px; }
+
+    /* ── AI Facts ── */
+    .ai-badge {
+      background: var(--accent-dim); border: 1px solid rgba(91,94,244,0.3);
+      color: var(--accent); font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; padding: 2px 7px; border-radius: 4px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .facts-list { display: flex; flex-direction: column; gap: 2px; }
+    .fact-item {
+      display: flex; gap: 12px; padding: 10px 12px;
+      border-radius: 8px; transition: background 0.15s;
+      opacity: 0; transform: translateY(6px);
+      animation: fadeUp 0.4s forwards;
+    }
+    .fact-item:hover { background: rgba(91,94,244,0.06); }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+    .fact-num { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: var(--accent); min-width: 20px; padding-top: 2px; }
+    .fact-text { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+    .fact-loading {
+      display: flex; align-items: center; gap: 10px;
+      padding: 18px 12px; color: var(--text-muted); font-size: 13px;
+    }
+    .dots span {
+      display: inline-block; width: 5px; height: 5px;
+      background: var(--accent); border-radius: 50%;
+      animation: bounce 1.2s ease-in-out infinite;
+    }
+    .dots span:nth-child(2) { animation-delay: 0.2s; }
+    .dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%,80%,100% { transform:scale(0.6);opacity:0.4; } 40% { transform:scale(1);opacity:1; } }
+
+    /* ── Log ── */
+    .log-wrap {
+      font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+      max-height: 160px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 3px;
+      padding: 14px 20px;
+    }
+    .log-line { display: flex; gap: 12px; padding: 3px 0; }
+    .log-ts { color: var(--text-dim); min-width: 76px; }
+    .log-msg { color: var(--text-muted); }
+    .log-line.ok  .log-msg { color: var(--success); }
+    .log-line.err .log-msg { color: var(--error); }
+    .log-line.info .log-msg { color: var(--accent); }
+
+    /* ── Toast ── */
+    #toasts {
+      position: fixed; bottom: 24px; right: 24px; z-index: 999;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .toast {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 16px; border-radius: 8px; border: 1px solid;
+      font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+      min-width: 260px;
+      animation: toastIn 0.25s ease, toastOut 0.3s ease 3.7s forwards;
+      backdrop-filter: blur(12px);
+    }
+    @keyframes toastIn  { from { opacity:0; transform:translateX(16px); } to { opacity:1; transform:none; } }
+    @keyframes toastOut { to   { opacity:0; transform:translateX(16px); } }
+    .toast.success { background:var(--success-dim); border-color:rgba(52,211,153,0.3); color:var(--success); }
+    .toast.error   { background:var(--error-dim);   border-color:rgba(248,113,113,0.3); color:var(--error); }
+    .toast.info    { background:var(--accent-dim);  border-color:rgba(91,94,244,0.3);   color:var(--accent); }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<!-- Topbar -->
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-dot"></div>
+    AutoDash
+  </div>
+  <div class="topbar-time" id="clock">--:--:--</div>
+</header>
+
+<div class="page">
+
+  <!-- Heading -->
+  <div>
+    <div class="page-title">Automation Dashboard</div>
+    <div class="page-sub">Send automated posts via your Telegram bot</div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Sent This Session</div>
+      <div class="stat-val" id="stat-sent">0</div>
+      <div class="stat-sub">total attempts</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Success Rate</div>
+      <div class="stat-val green" id="stat-rate">—</div>
+      <div class="stat-sub">delivered ok</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Bot Status</div>
+      <div class="stat-val" style="font-size:14px;padding-top:4px;color:var(--success)">● Ready</div>
+      <div class="stat-sub">credentials saved locally</div>
+    </div>
+  </div>
+
+  <!-- Bot Config Card -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-head-title">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
+        Bot Configuration
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="field-row">
+        <div class="field">
+          <div class="field-label">Bot Token <span class="req">*</span></div>
+          <input type="password" id="bot-token" placeholder="123456:ABCdef…" autocomplete="off"/>
+        </div>
+        <div class="field">
+          <div class="field-label">Chat ID <span class="req">*</span></div>
+          <input type="text" id="chat-id" placeholder="-1001234567890"/>
+        </div>
+      </div>
+    </div>
+    <div class="card-foot">
+      <button class="btn btn-ghost" id="btn-save-config">Save Config</button>
+    </div>
+  </div>
+
+  <!-- Compose Card -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-head-title">
+        <div class="tg-dot">✈</div>
+        Compose &amp; Send
+      </div>
+      <button class="btn btn-ghost" id="btn-clear" style="padding:5px 12px;font-size:10px;">Clear</button>
+    </div>
+    <div class="card-body">
+      <div class="field">
+        <div class="field-label">Message <span class="req">*</span></div>
+        <textarea id="msg-input" placeholder="Type your message here…" maxlength="4096"></textarea>
+        <div class="char-hint" id="char-count">0 / 4096</div>
+      </div>
+    </div>
+    <div class="card-foot">
+      <button class="btn btn-primary" id="btn-send">
+        <span class="btn-text" style="display:flex;align-items:center;gap:7px;">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2L2 7l5 2 2 5 5-12z"/></svg>
+          Send Automated Post
+        </span>
+        <span class="btn-spin">
+          <svg class="spin-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke-opacity="0.2"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
+          Sending…
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- AI Facts Card -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-head-title">
+        Web Dev Facts
+        
+      </div>
+      <button class="btn btn-ghost" id="btn-reload" style="padding:5px 12px;font-size:10px;">↻ Reload</button>
+    </div>
+    <div class="card-body" style="padding:8px 8px 12px;">
+      <div id="facts-body">
+        <div class="fact-loading">
+          <div class="dots"><span></span><span></span><span></span></div>
+          Generating facts…
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Log Card -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-head-title">Activity Log</div>
+    </div>
+    <div class="log-wrap" id="log"></div>
+  </div>
+
+</div>
+
+<div id="toasts"></div>
+
+<script>
+  // ── Clock ─────────────────────────────────────
+  function ts() { return new Date().toLocaleTimeString('en-GB', { hour12: false }); }
+  document.getElementById('clock').textContent = ts();
+  setInterval(() => document.getElementById('clock').textContent = ts(), 1000);
+
+  // ── Config (persisted in memory) ──────────────
+  let BOT_TOKEN = '';
+  let CHAT_ID   = '';
+
+  // Pre-fill if already typed
+  const tokenEl  = document.getElementById('bot-token');
+  const chatIdEl = document.getElementById('chat-id');
+
+  document.getElementById('btn-save-config').addEventListener('click', () => {
+    const t = tokenEl.value.trim();
+    const c = chatIdEl.value.trim();
+    if (!t || !c) { showToast('Both Bot Token and Chat ID are required.', 'error'); return; }
+    BOT_TOKEN = t;
+    CHAT_ID   = c;
+    showToast('Config saved ✓', 'success');
+    addLog('Bot config saved — token & chat_id set.', 'ok');
+  });
+
+  // ── Stats ──────────────────────────────────────
+  let totalSent = 0, totalOk = 0;
+  function updateStats(ok) {
+    totalSent++;
+    if (ok) totalOk++;
+    document.getElementById('stat-sent').textContent = totalSent;
+    document.getElementById('stat-rate').textContent = Math.round((totalOk / totalSent) * 100) + '%';
+  }
+
+  // ── Log ────────────────────────────────────────
+  const logEl = document.getElementById('log');
+  function addLog(msg, type = '') {
+    const row = document.createElement('div');
+    row.className = `log-line ${type}`;
+    row.innerHTML = `<span class="log-ts">${ts()}</span><span class="log-msg">${msg}</span>`;
+    logEl.appendChild(row);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+  addLog('Dashboard initialized. Ready to send.', 'info');
+
+  // ── Toast ──────────────────────────────────────
+  function showToast(msg, type = 'info') {
+    const icons = { success:'✓', error:'✕', info:'⟡' };
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerHTML = `<span>${icons[type]||'⟡'}</span><span>${msg}</span>`;
+    document.getElementById('toasts').appendChild(t);
+    setTimeout(() => t.remove(), 4200);
+  }
+
+  // ── Char counter ───────────────────────────────
+  const msgInput  = document.getElementById('msg-input');
+  const charCount = document.getElementById('char-count');
+  msgInput.addEventListener('input', () => {
+    charCount.textContent = `${msgInput.value.length} / 4096`;
+  });
+
+  // ── Clear ──────────────────────────────────────
+  document.getElementById('btn-clear').addEventListener('click', () => {
+    msgInput.value = '';
+    charCount.textContent = '0 / 4096';
+    msgInput.focus();
+  });
+
+  // ── Send ───────────────────────────────────────
+  const btnSend = document.getElementById('btn-send');
+  btnSend.addEventListener('click', async () => {
+    const text = msgInput.value.trim();
+    if (!text) { showToast('Message cannot be empty.', 'error'); return; }
+    if (!BOT_TOKEN || !CHAT_ID) {
+      showToast('Save your Bot Token & Chat ID first.', 'error');
+      return;
+    }
+
+    btnSend.disabled = true;
+    btnSend.classList.add('sending');
+    addLog(`Sending: "${text.slice(0, 60)}${text.length > 60 ? '…' : ''}"`, 'info');
+
+    try {
+      const res  = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: CHAT_ID, text, parse_mode: 'HTML' })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        updateStats(true);
+        showToast('Message delivered!', 'success');
+        addLog('Telegram API: 200 OK — delivered.', 'ok');
+        msgInput.value = '';
+        charCount.textContent = '0 / 4096';
+      } else {
+        updateStats(false);
+        showToast(`Error: ${data.description || 'Unknown'}`, 'error');
+        addLog(`Telegram error: ${data.description}`, 'err');
+      }
+    } catch (e) {
+      updateStats(false);
+      showToast('Network error. Check console.', 'error');
+      addLog(`Network error: ${e.message}`, 'err');
+    } finally {
+      btnSend.disabled = false;
+      btnSend.classList.remove('sending');
+    }
+  });
+
+  // ── Web Dev Facts (JSON array) ────────────────
+  const FACTS = [
+    { "id": 1, "fact": "CSS was proposed by Håkon Wium Lie in 1994." },
+    { "id": 2, "fact": "The first website ever built is still live at info.cern.ch." },
+    { "id": 3, "fact": "Over 95% of websites use JavaScript." },
+    { "id": 4, "fact": "HTTP/2 allows multiple requests over a single connection." },
+    { "id": 5, "fact": "WebAssembly enables near-native performance in browsers." }
+  ];
+
+  const factsBody = document.getElementById('facts-body');
+  function loadFacts() {
+    factsBody.innerHTML = '<div class="facts-list"></div>';
+    const list = factsBody.querySelector('.facts-list');
+    FACTS.forEach((item) => {
+      const div = document.createElement('div');
+      div.className = 'fact-item';
+      div.style.animationDelay = `${(item.id - 1) * 80}ms`;
+      div.innerHTML = `<span class="fact-num">0${item.id}</span><span class="fact-text">${item.fact}</span>`;
+      list.appendChild(div);
+    });
+  }
+  document.getElementById('btn-reload').addEventListener('click', loadFacts);
+  loadFacts();
+</script>
+</body>
+</html>

@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: #1f1f1f;
+    --border-light: #2a2a2a;
+    --text: #f0f0f0;
+    --muted: #555;
+    --accent: #e879f9;
+    --accent-dim: rgba(232,121,249,0.08);
+    --red: #ff4d4d;
+    --green: #34d399;
+    --mono: 'DM Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    padding: 48px 40px;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  header {
+    max-width: 1200px;
+    margin: 0 auto 56px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 28px;
+  }
+
+  .header-left h1 {
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .header-left h1 span {
+    color: var(--accent);
+  }
+
+  .header-left p {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 8px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .live-dot {
+    width: 7px;
+    height: 7px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Grid */
+  .dashboard {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .card {
+    background: var(--surface);
+    padding: 28px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .card:hover {
+    background: #161616;
+  }
+
+  .card.active {
+    background: var(--accent-dim);
+  }
+
+  .card.active::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 2px;
+    height: 100%;
+    background: var(--accent);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card:nth-child(1) { animation-delay: 0.05s; }
+  .card:nth-child(2) { animation-delay: 0.10s; }
+  .card:nth-child(3) { animation-delay: 0.15s; }
+  .card:nth-child(4) { animation-delay: 0.20s; }
+  .card:nth-child(5) { animation-delay: 0.25s; }
+  .card:nth-child(6) { animation-delay: 0.30s; }
+  .card:nth-child(7) { animation-delay: 0.35s; }
+  .card:nth-child(8) { animation-delay: 0.40s; }
+  .card:nth-child(9) { animation-delay: 0.45s; }
+  .card:nth-child(10) { animation-delay: 0.50s; }
+  .card:nth-child(11) { animation-delay: 0.55s; }
+  .card:nth-child(12) { animation-delay: 0.60s; }
+
+  .card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+
+  .category-tag {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: var(--border-light);
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+
+  .change-badge {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+
+  .change-badge.up {
+    color: var(--green);
+    background: rgba(52,211,153,0.12);
+  }
+
+  .change-badge.down {
+    color: var(--red);
+    background: rgba(255,77,77,0.1);
+  }
+
+  .brand {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-family: var(--mono);
+  }
+
+  .product-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 20px;
+    letter-spacing: -0.01em;
+  }
+
+  .price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .price {
+    font-family: var(--mono);
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+  }
+
+  .price-sym {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-right: 2px;
+  }
+
+  .stock-bar-wrap {
+    margin-bottom: 20px;
+  }
+
+  .stock-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .stock-bar {
+    height: 2px;
+    background: var(--border-light);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+
+  .stock-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 1px;
+    transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .stock-fill.low {
+    background: var(--red);
+  }
+
+  .cta {
+    width: 100%;
+    padding: 10px 0;
+    background: transparent;
+    border: 1px solid var(--border-light);
+    border-radius: 2px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .cta:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  /* Payload panel */
+  .payload-panel {
+    max-width: 1200px;
+    margin: 1px auto 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: none;
+  }
+
+  .payload-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 28px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .payload-title {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .payload-status {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+  }
+
+  .payload-body {
+    padding: 24px 28px;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    line-height: 1.8;
+    color: #888;
+    min-height: 140px;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  .payload-body .key { color: #6b9fff; }
+  .payload-body .string { color: #e879f9; }
+  .payload-body .number { color: #ff9d3d; }
+  .payload-body .bool { color: #ff6b9d; }
+  .payload-body .null-val { color: var(--muted); }
+
+  .placeholder-text {
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    line-height: 2;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>Market<span>.</span>Dashboard</h1>
+    <p>Real-time product intelligence feed</p>
+  </div>
+  <div class="live-badge">
+    <div class="live-dot"></div>
+    Live Feed
+  </div>
+</header>
+
+<div class="dashboard" id="dashboard"></div>
+
+<div class="payload-panel">
+  <div class="payload-header">
+    <span class="payload-title">API Payload Output</span>
+    <span class="payload-status" id="payload-status">— awaiting selection</span>
+  </div>
+  <div class="payload-body" id="payload">
+    <span class="placeholder-text">// Select any product card above to simulate an API call
+// Structured JSON response will render here</span>
+  </div>
+</div>
+
+<script>
+// ─── JSON Dataset (AI-generated) ─────────────────────────────────────────────
+const products = [
+  {
+    id: "PRD-001",
+    brand: "Nike",
+    product: "Air Zoom Pegasus 41",
+    category: "Footwear",
+    price: 12999,
+    originalPrice: 14995,
+    stock: 25,
+    maxStock: 50,
+    change: +2.4,
+    rating: 4.7,
+    sku: "NK-AZP41-BLK-10"
+  },
+  {
+    id: "PRD-002",
+    brand: "Apple",
+    product: "AirPods Pro (2nd Gen)",
+    category: "Audio",
+    price: 24900,
+    originalPrice: 26900,
+    stock: 8,
+    maxStock: 40,
+    change: -1.2,
+    rating: 4.9,
+    sku: "AP-APP2-WHT"
+  },
+  {
+    id: "PRD-003",
+    brand: "Samsung",
+    product: "Galaxy Watch 7",
+    category: "Wearables",
+    price: 29999,
+    originalPrice: 32999,
+    stock: 12,
+    maxStock: 35,
+    change: +0.8,
+    rating: 4.5,
+    sku: "SM-GW7-SIL-44"
+  },
+  {
+    id: "PRD-004",
+    brand: "Sony",
+    product: "WH-1000XM5",
+    category: "Audio",
+    price: 27999,
+    originalPrice: 29999,
+    stock: 5,
+    maxStock: 30,
+    change: -3.1,
+    rating: 4.8,
+    sku: "SN-WH1000XM5-BLK"
+  },
+  {
+    id: "PRD-005",
+    brand: "Logitech",
+    product: "MX Master 3S",
+    category: "Peripherals",
+    price: 9999,
+    originalPrice: 11999,
+    stock: 30,
+    maxStock: 60,
+    change: +1.5,
+    rating: 4.6,
+    sku: "LG-MXM3S-GRY"
+  },
+  {
+    id: "PRD-006",
+    brand: "Dell",
+    product: "XPS 13 Plus (2024)",
+    category: "Laptops",
+    price: 129999,
+    originalPrice: 139999,
+    stock: 7,
+    maxStock: 25,
+    change: -0.6,
+    rating: 4.5,
+    sku: "DL-XPS13P-I7-16"
+  },
+  {
+    id: "PRD-007",
+    brand: "OnePlus",
+    product: "Buds Pro 2",
+    category: "Audio",
+    price: 11999,
+    originalPrice: 13999,
+    stock: 22,
+    maxStock: 45,
+    change: +3.2,
+    rating: 4.4,
+    sku: "OP-BP2-BLK"
+  },
+  {
+    id: "PRD-008",
+    brand: "GoPro",
+    product: "HERO12 Black",
+    category: "Cameras",
+    price: 34999,
+    originalPrice: 39999,
+    stock: 9,
+    maxStock: 30,
+    change: -2.0,
+    rating: 4.6,
+    sku: "GP-H12B-BLK"
+  },
+  {
+    id: "PRD-009",
+    brand: "Kindle",
+    product: "Paperwhite Signature",
+    category: "E-Readers",
+    price: 14999,
+    originalPrice: 16999,
+    stock: 18,
+    maxStock: 40,
+    change: +1.1,
+    rating: 4.7,
+    sku: "KN-PWS-32GB"
+  },
+  {
+    id: "PRD-010",
+    brand: "Razer",
+    product: "BlackShark V2 Pro",
+    category: "Peripherals",
+    price: 17999,
+    originalPrice: 19999,
+    stock: 4,
+    maxStock: 20,
+    change: -1.8,
+    rating: 4.5,
+    sku: "RZ-BSV2P-BLK"
+  },
+  {
+    id: "PRD-011",
+    brand: "Boat",
+    product: "Rockerz 550 Pro",
+    category: "Audio",
+    price: 4999,
+    originalPrice: 5999,
+    stock: 35,
+    maxStock: 70,
+    change: +2.1,
+    rating: 4.3,
+    sku: "BT-RK550P-BLK"
+  },
+  {
+    id: "PRD-012",
+    brand: "Xiaomi",
+    product: "Pad 6 Pro",
+    category: "Tablets",
+    price: 34999,
+    originalPrice: 37999,
+    stock: 11,
+    maxStock: 30,
+    change: -0.9,
+    rating: 4.5,
+    sku: "XI-PAD6P-128"
+  }
+];
+
+// ─── DOM Injection ────────────────────────────────────────────────────────────
+const dashboard = document.getElementById("dashboard");
+let activeCard = null;
+
+products.forEach(p => {
+  const stockPct = Math.round((p.stock / p.maxStock) * 100);
+  const isLow = p.stock <= 8;
+  const isUp = p.change >= 0;
+
+  const card = document.createElement("div");
+  card.className = "card";
+  card.dataset.id = p.id;
+
+  card.innerHTML = `
+    <div class="card-meta">
+      <span class="category-tag">${p.category}</span>
+      <span class="change-badge ${isUp ? 'up' : 'down'}">${isUp ? '▲' : '▼'} ${Math.abs(p.change)}%</span>
+    </div>
+    <div class="brand">${p.brand}</div>
+    <div class="product-name">${p.product}</div>
+    <div class="price-row">
+      <span class="price-sym">₹</span>
+      <span class="price">${p.price.toLocaleString('en-IN')}</span>
+    </div>
+    <div class="stock-bar-wrap">
+      <div class="stock-label">
+        <span>Stock</span>
+        <span>${p.stock} / ${p.maxStock} units</span>
+      </div>
+      <div class="stock-bar">
+        <div class="stock-fill ${isLow ? 'low' : ''}" style="width:${stockPct}%"></div>
+      </div>
+    </div>
+    <button class="cta" onclick="simulateAPI('${p.id}')">View API Response →</button>
+  `;
+
+  dashboard.appendChild(card);
+});
+
+// ─── API Simulation ───────────────────────────────────────────────────────────
+function simulateAPI(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+
+  // Update active card state
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+  const thisCard = document.querySelector(`.card[data-id="${id}"]`);
+  if (thisCard) thisCard.classList.add('active');
+
+  const payload = {
+    status: "200 OK",
+    timestamp: new Date().toISOString(),
+    source: "market-dashboard/v2.1",
+    request: {
+      action: "product_fetch",
+      product_id: p.id,
+      sku: p.sku
+    },
+    data: {
+      brand: p.brand,
+      product: p.product,
+      category: p.category,
+      pricing: {
+        current: p.price,
+        original: p.originalPrice,
+        currency: "INR",
+        discount_pct: Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)
+      },
+      inventory: {
+        available: p.stock,
+        total_capacity: p.maxStock,
+        stock_level: p.stock <= 8 ? "LOW" : "NORMAL",
+        fill_rate: `${Math.round((p.stock / p.maxStock) * 100)}%`
+      },
+      market: {
+        change_24h: `${p.change > 0 ? '+' : ''}${p.change}%`,
+        trend: p.change >= 0 ? "BULLISH" : "BEARISH",
+        rating: p.rating
+      }
+    }
+  };
+
+  document.getElementById("payload-status").textContent = `200 OK · ${new Date().toLocaleTimeString()}`;
+  document.getElementById("payload").innerHTML = syntaxHighlight(JSON.stringify(payload, null, 2));
+}
+
+function syntaxHighlight(json) {
+  return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+    let cls = 'number';
+    if (/^"/.test(match)) {
+      cls = /:$/.test(match) ? 'key' : 'string';
+    } else if (/true|false/.test(match)) {
+      cls = 'bool';
+    } else if (/null/.test(match)) {
+      cls = 'null-val';
+    }
+    return `<span class="${cls}">${match}</span>`;
+  });
+}
+</script>
+</body>
+</html>
