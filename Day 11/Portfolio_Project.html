@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leave a Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f0ede6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .review-section { width: 100%; max-width: 560px; }
+
+    .review-eyebrow {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #534AB7;
+      margin-bottom: 0.5rem;
+    }
+
+    .review-heading {
+      font-size: 32px;
+      font-weight: 600;
+      color: #121212;
+      line-height: 1.2;
+      margin-bottom: 0.4rem;
+    }
+
+    .review-subtext {
+      font-size: 15px;
+      color: #6b6b6b;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .review-card {
+      background: #ffffff;
+      border: 1px solid #e2e0d8;
+      border-radius: 18px;
+      padding: 2rem;
+    }
+
+    .field-group { margin-bottom: 1.25rem; }
+
+    .field-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #2a2a2a;
+      margin-bottom: 6px;
+    }
+
+    .required { color: #D85A30; margin-left: 2px; }
+
+    .field-input {
+      width: 100%;
+      border: 1px solid #d8d6ce;
+      border-radius: 9px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #121212;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      appearance: none;
+    }
+
+    .field-input::placeholder { color: #aaa; }
+
+    .field-input:focus {
+      border-color: #7F77DD;
+      box-shadow: 0 0 0 3px rgba(127,119,221,0.15);
+    }
+
+    .field-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 13px center;
+      padding-right: 38px;
+      cursor: pointer;
+    }
+
+    .field-textarea {
+      min-height: 108px;
+      resize: vertical;
+      line-height: 1.65;
+    }
+
+    .char-counter {
+      font-size: 12px;
+      color: #aaa;
+      text-align: right;
+      margin-top: 4px;
+    }
+
+    .field-error {
+      font-size: 12px;
+      color: #D85A30;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .field-group.has-error .field-input {
+      border-color: #D85A30;
+      box-shadow: 0 0 0 3px rgba(216,90,48,0.12);
+    }
+
+    .field-group.has-error .field-error { display: block; }
+
+    .submit-btn {
+      width: 100%;
+      padding: 13px;
+      background: #534AB7;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .submit-btn:hover { background: #3C3489; }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled { background: #b0acd8; cursor: not-allowed; transform: none; }
+
+    .success-state {
+      display: none;
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+    }
+
+    .success-check {
+      width: 52px;
+      height: 52px;
+      background: #E1F5EE;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.25rem;
+    }
+
+    .success-check svg {
+      width: 24px;
+      height: 24px;
+      stroke: #0F6E56;
+      stroke-width: 2.5;
+      fill: none;
+    }
+
+    .success-title { font-size: 18px; font-weight: 600; color: #121212; margin-bottom: 0.4rem; }
+    .success-sub   { font-size: 14px; color: #6b6b6b; line-height: 1.6; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 480px) {
+      .review-card { padding: 1.5rem; }
+      .review-heading { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+
+  <section class="review-section" aria-labelledby="review-heading">
+
+    <p class="review-eyebrow">Feedback</p>
+    <h2 class="review-heading" id="review-heading">Leave a review</h2>
+    <p class="review-subtext">Enjoyed my work? I'd love to hear your thoughts.</p>
+
+    <div class="review-card">
+
+      <div id="form-area">
+
+        <div class="field-group" id="group-name">
+          <label class="field-label" for="visitorName">
+            Your name <span class="required">*</span>
+          </label>
+          <input
+            class="field-input"
+            type="text"
+            id="visitorName"
+            placeholder="e.g. Priya Shah"
+            autocomplete="name"
+            maxlength="80"
+          />
+          <p class="field-error" id="error-name" role="alert">Please enter your name.</p>
+        </div>
+
+        <div class="field-group" id="group-rating">
+          <label class="field-label" for="rating">
+            Rating <span class="required">*</span>
+          </label>
+          <select class="field-input field-select" id="rating">
+            <option value="" disabled selected>Select a rating</option>
+            <option value="5">⭐⭐⭐⭐⭐ &nbsp; 5 — Outstanding</option>
+            <option value="4">⭐⭐⭐⭐ &nbsp; 4 — Great</option>
+            <option value="3">⭐⭐⭐ &nbsp; 3 — Good</option>
+            <option value="2">⭐⭐ &nbsp; 2 — Fair</option>
+            <option value="1">⭐ &nbsp; 1 — Poor</option>
+          </select>
+          <p class="field-error" id="error-rating" role="alert">Please select a rating.</p>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="feedback">
+            Feedback <span style="color:#aaa; font-weight:400;">(optional)</span>
+          </label>
+          <textarea
+            class="field-input field-textarea"
+            id="feedback"
+            placeholder="Tell me what you thought of the work..."
+            maxlength="500"
+          ></textarea>
+          <p class="char-counter"><span id="char-count">0</span> / 500</p>
+        </div>
+
+        <button class="submit-btn" id="submit-btn" onclick="handleSubmit()">
+          Submit review
+        </button>
+
+      </div>
+
+      <div class="success-state" id="success-state" aria-live="polite">
+        <div class="success-check" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><polyline points="4 12 9 17 20 7"/></svg>
+        </div>
+        <p class="success-title">Thanks for your review!</p>
+        <p class="success-sub">Your feedback has been saved. I really appreciate it.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwVdCR0R9xhu7mZPGm07rUYjH8zbhR9A4w_BO1cn_Z1cxhuX6Eo8iweqAzoKagT2Tk/exec";
+
+    document.getElementById("feedback").addEventListener("input", function () {
+      document.getElementById("char-count").textContent = this.value.length;
+    });
+
+    function setFieldError(groupId, errorId, show) {
+      document.getElementById(groupId).classList.toggle("has-error", show);
+      document.getElementById(errorId).style.display = show ? "block" : "none";
+    }
+
+    function setButtonLoading(btn, loading) {
+      if (loading) {
+        btn.disabled = true;
+        btn.dataset.originalText = btn.textContent;
+        btn.innerHTML = '<span class="spinner" aria-hidden="true"></span> Submitting…';
+      } else {
+        btn.disabled = false;
+        btn.textContent = btn.dataset.originalText || "Submit review";
+      }
+    }
+
+    async function handleSubmit() {
+      const visitorName = document.getElementById("visitorName").value.trim();
+      const ratingStr   = document.getElementById("rating").value;
+      const feedback    = document.getElementById("feedback").value.trim();
+
+      let valid = true;
+      if (!visitorName) { setFieldError("group-name",   "error-name",   true);  valid = false; }
+      else              { setFieldError("group-name",   "error-name",   false); }
+      if (!ratingStr)   { setFieldError("group-rating", "error-rating", true);  valid = false; }
+      else              { setFieldError("group-rating", "error-rating", false); }
+      if (!valid) return;
+
+      const btn = document.getElementById("submit-btn");
+      setButtonLoading(btn, true);
+
+      try {
+        /* Using an HTML form submit via a hidden iframe — bypasses CORS entirely */
+        submitViaIframe(visitorName, Number(ratingStr), feedback);
+
+      } catch (err) {
+        setButtonLoading(btn, false);
+        alert("Something went wrong: " + err.message + "\n\nPlease try again.");
+      }
+    }
+
+    function submitViaIframe(visitorName, rating, feedback) {
+      /* Create a hidden iframe to receive the response */
+      const iframe = document.createElement("iframe");
+      iframe.name  = "hidden_iframe";
+      iframe.style.display = "none";
+      document.body.appendChild(iframe);
+
+      /* Create a hidden form and submit it into the iframe */
+      const form = document.createElement("form");
+      form.method  = "POST";
+      form.action  = WEB_APP_URL;
+      form.target  = "hidden_iframe";
+
+      const fields = { visitorName, rating, feedback };
+      for (const [key, val] of Object.entries(fields)) {
+        const input = document.createElement("input");
+        input.type  = "hidden";
+        input.name  = key;
+        input.value = val;
+        form.appendChild(input);
+      }
+
+      document.body.appendChild(form);
+      form.submit();
+
+      /* Show success after a short delay — the iframe handles silently */
+      setTimeout(() => {
+        document.getElementById("form-area").style.display    = "none";
+        document.getElementById("success-state").style.display = "block";
+        form.remove();
+        iframe.remove();
+      }, 2000);
+    }
+  </script>
+
+</body>
+</html>
