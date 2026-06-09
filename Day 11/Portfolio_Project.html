@@ -6,14 +6,14 @@
   <title>Leave a Review</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Inter', sans-serif;
-      background: #f0ede6;
+      font-family: 'DM Sans', sans-serif;
+      background: #E8E6E0;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -21,70 +21,141 @@
       padding: 2rem 1rem;
     }
 
-    .review-section { width: 100%; max-width: 560px; }
-
-    .review-eyebrow {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #534AB7;
-      margin-bottom: 0.5rem;
-    }
-
-    .review-heading {
-      font-size: 32px;
-      font-weight: 600;
-      color: #121212;
-      line-height: 1.2;
-      margin-bottom: 0.4rem;
-    }
-
-    .review-subtext {
-      font-size: 15px;
-      color: #6b6b6b;
-      margin-bottom: 2rem;
-      line-height: 1.6;
-    }
-
+    /* ── CARD SHELL ── */
     .review-card {
-      background: #ffffff;
-      border: 1px solid #e2e0d8;
-      border-radius: 18px;
-      padding: 2rem;
+      width: 100%;
+      max-width: 860px;
+      display: grid;
+      grid-template-columns: 1fr 1.45fr;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.16), 0 4px 16px rgba(0,0,0,0.08);
     }
 
-    .field-group { margin-bottom: 1.25rem; }
+    /* ── LEFT PANEL ── */
+    .panel-left {
+      background: #100F1C;
+      padding: 3rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel-mark {
+      font-family: 'Playfair Display', serif;
+      font-size: 240px;
+      line-height: 0.75;
+      color: #C9973F;
+      opacity: 0.10;
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .panel-eyebrow {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #C9973F;
+      margin-bottom: 1.4rem;
+      position: relative;
+    }
+
+    .panel-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: 44px;
+      font-weight: 700;
+      color: #F5F2EC;
+      line-height: 1.12;
+      position: relative;
+    }
+
+    .panel-heading em {
+      font-style: italic;
+      color: #C9973F;
+    }
+
+    .panel-sub {
+      font-size: 14px;
+      color: #6E6B80;
+      line-height: 1.75;
+      margin-top: 1.2rem;
+      position: relative;
+    }
+
+    .panel-footer {
+      position: relative;
+      margin-top: auto;
+      padding-top: 3rem;
+    }
+
+    .panel-stars {
+      font-size: 18px;
+      letter-spacing: 3px;
+      margin-bottom: 0.6rem;
+    }
+
+    .panel-tagline {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 13.5px;
+      color: #4E4B60;
+      line-height: 1.65;
+    }
+
+    /* ── RIGHT PANEL ── */
+    .panel-right {
+      background: #FAFAF8;
+      padding: 2.75rem 2.5rem;
+    }
+
+    /* ── FORM ── */
+    .field-group { margin-bottom: 1.2rem; }
 
     .field-label {
       display: block;
-      font-size: 13px;
-      font-weight: 500;
-      color: #2a2a2a;
-      margin-bottom: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #37354A;
+      margin-bottom: 7px;
     }
 
-    .required { color: #D85A30; margin-left: 2px; }
+    .optional-tag {
+      color: #B0ADC0;
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 12px;
+    }
+
+    .required { color: #BF4E2A; margin-left: 2px; }
 
     .field-input {
       width: 100%;
-      border: 1px solid #d8d6ce;
-      border-radius: 9px;
-      padding: 10px 14px;
+      border: 1.5px solid #DDDAD2;
+      border-radius: 10px;
+      padding: 11px 14px;
       font-size: 14px;
-      font-family: inherit;
-      color: #121212;
+      font-family: 'DM Sans', inherit;
+      color: #18171F;
       background: #fff;
       outline: none;
       transition: border-color 0.15s, box-shadow 0.15s;
       appearance: none;
     }
 
-    .field-input::placeholder { color: #aaa; }
+    .field-input::placeholder { color: #B0ADC0; }
 
     .field-input:focus {
-      border-color: #7F77DD;
-      box-shadow: 0 0 0 3px rgba(127,119,221,0.15);
+      border-color: #7565C8;
+      box-shadow: 0 0 0 3.5px rgba(117,101,200,0.13);
     }
 
     .field-select {
@@ -96,28 +167,28 @@
     }
 
     .field-textarea {
-      min-height: 108px;
+      min-height: 110px;
       resize: vertical;
       line-height: 1.65;
     }
 
     .char-counter {
-      font-size: 12px;
-      color: #aaa;
+      font-size: 11px;
+      color: #B0ADC0;
       text-align: right;
       margin-top: 4px;
     }
 
     .field-error {
-      font-size: 12px;
-      color: #D85A30;
+      font-size: 11.5px;
+      color: #BF4E2A;
       margin-top: 4px;
       display: none;
     }
 
     .field-group.has-error .field-input {
-      border-color: #D85A30;
-      box-shadow: 0 0 0 3px rgba(216,90,48,0.12);
+      border-color: #BF4E2A;
+      box-shadow: 0 0 0 3px rgba(191,78,42,0.1);
     }
 
     .field-group.has-error .field-error { display: block; }
@@ -125,79 +196,110 @@
     .submit-btn {
       width: 100%;
       padding: 13px;
-      background: #534AB7;
-      color: #fff;
+      background: #100F1C;
+      color: #F5F2EC;
       border: none;
       border-radius: 10px;
-      font-size: 15px;
-      font-weight: 500;
-      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'DM Sans', inherit;
+      letter-spacing: 0.04em;
       cursor: pointer;
       transition: background 0.15s, transform 0.1s;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
+      margin-top: 0.25rem;
     }
 
-    .submit-btn:hover { background: #3C3489; }
-    .submit-btn:active { transform: scale(0.98); }
-    .submit-btn:disabled { background: #b0acd8; cursor: not-allowed; transform: none; }
+    .submit-btn:hover { background: #272440; }
+    .submit-btn:active { transform: scale(0.985); }
+    .submit-btn:disabled { background: #9A97B5; cursor: not-allowed; transform: none; }
 
+    /* ── SUCCESS ── */
     .success-state {
       display: none;
       text-align: center;
-      padding: 2.5rem 1.5rem;
+      padding: 3.5rem 1.5rem;
     }
 
     .success-check {
-      width: 52px;
-      height: 52px;
-      background: #E1F5EE;
+      width: 56px;
+      height: 56px;
+      background: #E4F4EE;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 1.25rem;
+      margin: 0 auto 1.5rem;
     }
 
     .success-check svg {
       width: 24px;
       height: 24px;
-      stroke: #0F6E56;
+      stroke: #0F6B50;
       stroke-width: 2.5;
       fill: none;
     }
 
-    .success-title { font-size: 18px; font-weight: 600; color: #121212; margin-bottom: 0.4rem; }
-    .success-sub   { font-size: 14px; color: #6b6b6b; line-height: 1.6; }
+    .success-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #18171F;
+      margin-bottom: 0.5rem;
+    }
 
+    .success-sub { font-size: 14px; color: #6E6B80; line-height: 1.65; }
+
+    /* ── SPINNER ── */
     @keyframes spin { to { transform: rotate(360deg); } }
     .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255,255,255,0.35);
+      width: 15px;
+      height: 15px;
+      border: 2px solid rgba(255,255,255,0.28);
       border-top-color: #fff;
       border-radius: 50%;
       animation: spin 0.65s linear infinite;
       flex-shrink: 0;
     }
 
-    @media (max-width: 480px) {
-      .review-card { padding: 1.5rem; }
-      .review-heading { font-size: 26px; }
+    /* ── RESPONSIVE ── */
+    @media (max-width: 620px) {
+      .review-card { grid-template-columns: 1fr; }
+      .panel-left  { padding: 2.25rem 1.75rem 2.5rem; }
+      .panel-heading { font-size: 34px; }
+      .panel-mark  { font-size: 170px; }
+      .panel-footer { padding-top: 2rem; }
+      .panel-right { padding: 2rem 1.75rem; }
     }
   </style>
 </head>
 <body>
 
-  <section class="review-section" aria-labelledby="review-heading">
+  <div class="review-card">
 
-    <p class="review-eyebrow">Feedback</p>
-    <h2 class="review-heading" id="review-heading">Leave a review</h2>
-    <p class="review-subtext">Enjoyed my work? I'd love to hear your thoughts.</p>
+    <!-- ── LEFT DECORATIVE PANEL ── -->
+    <div class="panel-left">
+      <div class="panel-mark" aria-hidden="true">"</div>
 
-    <div class="review-card">
+      <div>
+        <p class="panel-eyebrow">Feedback</p>
+        <h2 class="panel-heading" id="review-heading">
+          Leave a<br /><em>review</em>
+        </h2>
+        <p class="panel-sub">Enjoyed my work? I'd<br />love to hear your thoughts.</p>
+      </div>
+
+      <div class="panel-footer">
+        <div class="panel-stars">⭐⭐⭐⭐⭐</div>
+        <p class="panel-tagline">"Every review helps me grow<br />and do better work."</p>
+      </div>
+    </div>
+
+    <!-- ── RIGHT FORM PANEL ── -->
+    <div class="panel-right">
 
       <div id="form-area">
 
@@ -233,7 +335,7 @@
 
         <div class="field-group">
           <label class="field-label" for="feedback">
-            Feedback <span style="color:#aaa; font-weight:400;">(optional)</span>
+            Feedback <span class="optional-tag">(optional)</span>
           </label>
           <textarea
             class="field-input field-textarea"
@@ -259,9 +361,11 @@
       </div>
 
     </div>
-  </section>
+
+  </div>
 
   <script>
+    /* ── ALL LOGIC UNCHANGED ── */
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwVdCR0R9xhu7mZPGm07rUYjH8zbhR9A4w_BO1cn_Z1cxhuX6Eo8iweqAzoKagT2Tk/exec";
 
     document.getElementById("feedback").addEventListener("input", function () {
@@ -302,7 +406,6 @@
       try {
         /* Using an HTML form submit via a hidden iframe — bypasses CORS entirely */
         submitViaIframe(visitorName, Number(ratingStr), feedback);
-
       } catch (err) {
         setButtonLoading(btn, false);
         alert("Something went wrong: " + err.message + "\n\nPlease try again.");
