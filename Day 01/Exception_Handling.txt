@@ -1,0 +1,71 @@
+# Exception Handling in Python
+
+## Introduction
+
+Exception handling is a technique used in Python to handle errors that occur while a program is running. It prevents the program from crashing unexpectedly and allows the programmer to display a friendly error message or take alternative actions.
+
+For example, if a user enters text instead of a number, Python normally stops the program and shows an error. Using exception handling, we can catch this error and continue running the program smoothly.
+
+## Core Logic
+
+Exception handling mainly uses two keywords:
+
+1. **try**
+
+   * The code that may cause an error is written inside the `try` block.
+   * Python tries to execute this code normally.
+
+2. **except**
+
+   * If an error occurs inside the `try` block, Python immediately jumps to the `except` block.
+   * The code inside `except` is executed to handle the error.
+
+This mechanism makes programs more reliable and user-friendly.
+
+## Example Program
+
+```python
+# Tell Python to try executing the code in this block
+try:
+
+    # Ask the user to enter a value and convert it to an integer
+    number = int(input("Enter a number: "))
+
+    # Display the number entered by the user
+    print("You entered:", number)
+
+# Catch the ValueError exception if the input is not a valid integer
+except ValueError:
+
+    # Display an error message instead of crashing the program
+    print("Invalid input! Please enter numbers only.")
+```
+
+## Explanation of the Program
+
+* The `try` block contains code that may generate an error.
+* The `input()` function takes input from the user.
+* The `int()` function converts the input into an integer.
+* If the user enters a valid number, the program prints the entered value.
+* If the user enters invalid data such as letters or symbols, Python raises a `ValueError`.
+* The `except ValueError` block catches this error and displays a friendly message.
+
+## Sample Output
+
+### Case 1: Valid Input
+
+```
+Enter a number: 25
+You entered: 25
+```
+
+### Case 2: Invalid Input
+
+```
+Enter a number: hello
+Invalid input! Please enter numbers only.
+```
+
+## Conclusion
+
+Exception handling is an important feature in Python that helps programmers manage errors gracefully. By using `try` and `except`, programs become more stable, user-friendly, and less likely to crash due to unexpected input or runtime errors.
